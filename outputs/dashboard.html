@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Autonomous Search &amp; Rescue Robot Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#0b1120;--panel:#121c2f;--panel2:#17243a;--text:#edf3ff;--muted:#9eacc4;--line:#2b3a54;--accent:#61d6b3;--blue:#77a9ff;}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#172641 0,#0b1120 58%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+main{max-width:1440px;margin:auto;padding:30px 22px 46px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:2px;font-size:12px;font-weight:800}
+h1{font-size:clamp(26px,4vw,42px);line-height:1.12;margin:9px 0}
+.subtitle{color:var(--muted);margin:0;line-height:1.6}
+.pill{border:1px solid #316653;color:var(--accent);border-radius:999px;padding:9px 13px;font-size:12px;font-weight:700;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:18px}
+.card,.panel{background:linear-gradient(145deg,var(--panel),#10192a);border:1px solid var(--line);border-radius:17px;box-shadow:0 10px 28px #0002}
+.card{padding:19px;min-height:120px}
+.kpi-label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.kpi{font-size:clamp(26px,3vw,36px);font-weight:800;margin:13px 0 5px;letter-spacing:-1px}
+.kpi-sub{color:var(--muted);font-size:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.panel{padding:20px;min-width:0;margin-bottom:18px}
+.two .panel{margin-bottom:0}
+h2{font-size:17px;margin:0 0 5px}
+.desc{color:var(--muted);font-size:12px;line-height:1.5;margin:0 0 18px}
+.chartbox{height:280px;position:relative}
+.map{width:100%;display:block;border-radius:12px;border:1px solid var(--line);background:#09101d;max-height:640px;object-fit:contain}
+.map-placeholder{padding:25px;background:var(--panel2);border-radius:12px;color:var(--muted)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:850px;font-size:13px}
+th{text-align:right;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px;background:#1a2940}
+th:first-child,th:nth-child(2),td:first-child,td:nth-child(2){text-align:left}
+th,td{padding:13px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+thead tr:first-child th{border-bottom:1px solid #41516b}
+thead tr:nth-child(2) th{font-size:10px}
+tbody tr:hover{background:#ffffff08}
+.group-bfs{color:var(--blue)} .group-astar{color:var(--accent)}
+.insights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.insight{padding:15px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);line-height:1.5;font-size:13px}
+.insight strong{display:block;color:var(--accent);margin-bottom:6px;font-size:14px}
+footer{color:var(--muted);font-size:11px;line-height:1.7;margin-top:18px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:1fr}.insights{grid-template-columns:1fr}}
+@media(max-width:480px){main{padding:20px 12px}.grid{gap:9px}.card{padding:14px;min-height:110px}.kpi{font-size:26px}}
+</style>
+</head>
+<body><main>
+<header><div><div class="eyebrow">Robotics Vision · Simulation Analytics</div>
+<h1>Autonomous Search &amp; Rescue Robot</h1>
+<p class="subtitle">Mission performance, path-planning benchmarks, and obstacle discovery.</p></div>
+<div class="pill">LATEST SAVED RESULTS · A*</div></header>
+
+<section class="grid">
+<article class="card"><div class="kpi-label">Target coverage</div><div class="kpi">100.0%</div><div class="kpi-sub">6 of 6 targets visited</div></article>
+<article class="card"><div class="kpi-label">Mission path length</div><div class="kpi">157 <span style="font-size:14px;color:var(--muted)">steps</span></div><div class="kpi-sub">Grid movement steps</div></article>
+<article class="card"><div class="kpi-label">Obstacles discovered</div><div class="kpi">8</div><div class="kpi-sub">Dynamic obstacles detected</div></article>
+<article class="card"><div class="kpi-label">Replanning events</div><div class="kpi">5</div><div class="kpi-sub">Mission recovery and rerouting</div></article>
+<article class="card"><div class="kpi-label">Mission runtime</div><div class="kpi">0.042 <span style="font-size:14px;color:var(--muted)">sec</span></div><div class="kpi-sub">Recorded mission runtime</div></article>
+<article class="card"><div class="kpi-label">Planning time</div><div class="kpi">23.64 <span style="font-size:14px;color:var(--muted)">ms</span></div><div class="kpi-sub">Accumulated planning time</div></article>
+<article class="card"><div class="kpi-label">Explored-cell total</div><div class="kpi">5,062</div><div class="kpi-sub">May count cells across repeated plans</div></article>
+<article class="card"><div class="kpi-label">Environment</div><div class="kpi">24 × 32</div><div class="kpi-sub">Rows × columns</div></article>
+</section>
+
+<section class="two">
+<article class="panel"><h2>Explored cells by target</h2><p class="desc">Lower counts generally mean less search work for a target.</p><div class="chartbox"><canvas id="exploredChart"></canvas></div></article>
+<article class="panel"><h2>Path length by target</h2><p class="desc">Compare the number of grid steps returned by each algorithm.</p><div class="chartbox"><canvas id="pathChart"></canvas></div></article>
+</section>
+<section class="two">
+<article class="panel"><h2>Planning runtime by target</h2><p class="desc">Runtime is measured in milliseconds and varies with system load.</p><div class="chartbox"><canvas id="runtimeChart"></canvas></div></article>
+<article class="panel"><h2>Latest mission map</h2><p class="desc">Map image saved by the simulation run.</p>
+<img class="map" src="final_run.png" alt="Final search and rescue robot mission map"
+onerror="this.outerHTML='<div class=&quot;map-placeholder&quot;>Could not load final_run.png. Place dashboard.html beside final_run.png in outputs.</div>'"></article>
+</section>
+
+<section class="panel"><h2>BFS vs A* benchmark details</h2><p class="desc">Values are read from all_targets_benchmark.csv each time this dashboard is generated.</p>
+<div class="table-wrap"><table>
+<thead><tr><th rowspan="2">Target</th><th rowspan="2">Grid cell</th><th colspan="4" class="group-bfs">BFS</th><th colspan="4" class="group-astar">A*</th></tr>
+<tr><th>Status</th><th>Path steps</th><th>Explored</th><th>Runtime (ms)</th><th>Status</th><th>Path steps</th><th>Explored</th><th>Runtime (ms)</th></tr></thead>
+<tbody><tr><td>1</td><td>(2, 27)</td><td>Reachable</td><td>27</td><td>398</td><td>0.9434</td><td>Reachable</td><td>27</td><td>52</td><td>0.2963</td></tr>\n<tr><td>2</td><td>(10, 5)</td><td>Reachable</td><td>13</td><td>120</td><td>0.3039</td><td>Reachable</td><td>13</td><td>50</td><td>0.2118</td></tr>\n<tr><td>3</td><td>(18, 27)</td><td>Reachable</td><td>43</td><td>657</td><td>1.4616</td><td>Reachable</td><td>43</td><td>430</td><td>1.6460</td></tr>\n<tr><td>4</td><td>(21, 4)</td><td>Reachable</td><td>23</td><td>297</td><td>1.0990</td><td>Reachable</td><td>23</td><td>84</td><td>0.3699</td></tr>\n<tr><td>5</td><td>(12, 15)</td><td>Reachable</td><td>25</td><td>350</td><td>0.7111</td><td>Reachable</td><td>25</td><td>162</td><td>0.6338</td></tr>\n<tr><td>6</td><td>(5, 30)</td><td>Reachable</td><td>33</td><td>524</td><td>1.2530</td><td>Reachable</td><td>33</td><td>142</td><td>0.5512</td></tr></tbody></table></div></section>
+
+<section class="panel"><h2>Quick interpretation</h2><p class="desc">Automatically calculated from the benchmark CSV.</p>
+<div class="insights">
+<div class="insight"><strong>60.8% fewer explored cells</strong>
+A* explored 920 cells across benchmark targets compared with 2,346 for BFS. These are summed per-target searches.</div>
+<div class="insight"><strong>Path lengths compared</strong>
+6 target(s) have matching reachable BFS and A* path lengths.</div>
+<div class="insight"><strong>Interpret runtime carefully</strong>
+A* may explore fewer cells, but individual runtime can vary with system load and small grid sizes.</div>
+</div></section>
+<footer>Generated from <code>outputs/all_targets_benchmark.csv</code> and <code>outputs/metrics.json</code>. Mission metrics describe the selected-algorithm run; benchmark results compare BFS and A*.<br>Runtime depends on hardware and system load. Explored-cell totals may count the same cell in multiple planning calls. Replanning count records events tracked by the robot, not total planning calls.</footer>
+</main>
+<script>
+const labels = ["T1 (2,27)", "T2 (10,5)", "T3 (18,27)", "T4 (21,4)", "T5 (12,15)", "T6 (5,30)"];
+const bfsExplored = [398, 120, 657, 297, 350, 524], astarExplored = [52, 50, 430, 84, 162, 142];
+const bfsPath = [27, 13, 43, 23, 25, 33], astarPath = [27, 13, 43, 23, 25, 33];
+const bfsRuntime = [0.9434, 0.3039, 1.4616, 1.099, 0.7111, 1.253], astarRuntime = [0.2963, 0.2118, 1.646, 0.3699, 0.6338, 0.5512];
+Chart.defaults.color = '#b8c5da';
+Chart.defaults.borderColor = '#2b3a54';
+const common = {responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{usePointStyle:true,boxWidth:8}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:'#26354b'}}}};
+function makeChart(id, bfs, astar, yTitle) {
+ new Chart(document.getElementById(id), {type:'bar',data:{labels,datasets:[
+ {label:'BFS',data:bfs,backgroundColor:'#77a9ff',borderRadius:5},
+ {label:'A*',data:astar,backgroundColor:'#61d6b3',borderRadius:5}
+ ]},options:{...common,scales:{...common.scales,y:{...common.scales.y,title:{display:true,text:yTitle}}}}});
+}
+makeChart('exploredChart',bfsExplored,astarExplored,'Cells explored');
+makeChart('pathChart',bfsPath,astarPath,'Grid steps');
+makeChart('runtimeChart',bfsRuntime,astarRuntime,'Milliseconds');
+</script></body></html>
