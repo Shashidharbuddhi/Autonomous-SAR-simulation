@@ -17,6 +17,10 @@ pip install -r requirements.txt
 
 ## Run
 ```bash
+python interface.py
+```
+To run the simulation
+```bash
 python main.py
 ```
 For a faster non-animated run:
