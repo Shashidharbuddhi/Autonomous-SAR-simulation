@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search & Rescue Robot — Results Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--ink:#182235;--muted:#64748b;--line:#e5eaf2;--blue:#2864dc;--orange:#e69f00;--green:#18865b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",Arial,sans-serif}
+header{background:linear-gradient(120deg,#142544,#2456a6);color:white;padding:30px clamp(18px,4vw,56px)}
+header h1{margin:0 0 6px;font-size:clamp(24px,3vw,36px)}header p{margin:0;color:#dbe7ff}
+main{max-width:1400px;margin:auto;padding:24px clamp(14px,3vw,36px) 44px}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:20px;box-shadow:0 5px 18px #1e293b08}
+.metric-label{color:var(--muted);font-size:13px;font-weight:600}.metric-value{font-size:30px;font-weight:750;margin:5px 0}.metric-note{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:18px}
+h2{font-size:18px;margin:0 0 12px}.chart-wrap{height:300px;position:relative}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:10px 9px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}tbody tr:last-child td{border-bottom:0}
+.status{display:inline-block;background:#e6f6ee;color:#126943;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700}
+.image-card img{width:100%;height:auto;display:block;border-radius:9px;border:1px solid var(--line)}
+.note{font-size:13px;color:var(--muted);margin:12px 0 0}.foot{color:var(--muted);font-size:12px;text-align:center;margin-top:20px}
+@media(max-width:850px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}}
+@media(max-width:440px){.metrics{grid-template-columns:1fr 1fr}.metric-value{font-size:24px}.card{padding:14px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Autonomous Search & Rescue Robot</h1>
+  <p>Simulation results dashboard · 24 × 32 occupancy grid · Four-connected path planning</p>
+</header>
+<main>
+  <section class="metrics">
+    <div class="card"><div class="metric-label">TARGET COVERAGE</div><div class="metric-value">100%</div><div class="metric-note">6 of 6 rescue targets reached</div></div>
+    <div class="card"><div class="metric-label">MISSION PATH</div><div class="metric-value">157 <small style="font-size:14px">steps</small></div><div class="metric-note">Recorded movement history</div></div>
+    <div class="card"><div class="metric-label">OBSTACLES DISCOVERED</div><div class="metric-value">8</div><div class="metric-note">Dynamic obstacles detected</div></div>
+    <div class="card"><div class="metric-label">REPLANNING EVENTS</div><div class="metric-value">5</div><div class="metric-note">Route adjustments during mission</div></div>
+  </section>
+
+  <section class="grid">
+    <div class="card"><h2>Explored cells by target</h2><div class="chart-wrap"><canvas id="exploredChart"></canvas></div></div>
+    <div class="card"><h2>Path length by target</h2><div class="chart-wrap"><canvas id="pathChart"></canvas></div></div>
+    <div class="card"><h2>Planning runtime by target</h2><div class="chart-wrap"><canvas id="runtimeChart"></canvas></div><p class="note">Runtime is measured in milliseconds and can fluctuate with system load. A* is not guaranteed to be faster on every individual target.</p></div>
+    <div class="card"><h2>Benchmark summary</h2>
+      <table><thead><tr><th>Metric</th><th>BFS</th><th>A*</th></tr></thead><tbody>
+      <tr><td>Total explored cells</td><td>2,346</td><td>920</td></tr>
+      <tr><td>Average explored / target</td><td>391.0</td><td>153.3</td></tr>
+      <tr><td>Path lengths matched</td><td colspan="2">6 of 6 targets</td></tr>
+      <tr><td>Explored-cell reduction with A*</td><td colspan="2"><strong>60.8%</strong></td></tr>
+      </tbody></table>
+      <p class="note">The reduction compares the sum of explored cells over the six independent benchmark runs. It is not a runtime speedup claim.</p>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card"><h2>All-target benchmark data</h2>
+      <table><thead><tr><th>Target</th><th>BFS steps</th><th>A* steps</th><th>BFS explored</th><th>A* explored</th></tr></thead><tbody>
+      <tr><td>(2, 27)</td><td>27</td><td>27</td><td>398</td><td>52</td></tr>
+      <tr><td>(10, 5)</td><td>13</td><td>13</td><td>120</td><td>50</td></tr>
+      <tr><td>(18, 27)</td><td>43</td><td>43</td><td>657</td><td>430</td></tr>
+      <tr><td>(21, 4)</td><td>23</td><td>23</td><td>297</td><td>84</td></tr>
+      <tr><td>(12, 15)</td><td>25</td><td>25</td><td>350</td><td>162</td></tr>
+      <tr><td>(5, 30)</td><td>33</td><td>33</td><td>524</td><td>142</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card image-card"><h2>Final robot path</h2><img src="final_run.png" alt="Final rescue mission path visualization" onerror="this.style.display='none';document.getElementById('imgFallback').style.display='block'"><p id="imgFallback" style="display:none;color:#64748b">Image not found. Keep dashboard.html in the same folder as final_run.png.</p><p class="note">Keep this HTML file in the same folder as <code>final_run.png</code> for the visualization to appear.</p></div>
+  </section>
+  <div class="foot">Autonomous Search & Rescue Robot Simulation · Benchmark results transcribed from the reported console run.</div>
+</main>
+<script>
+const labels=['Target 1','Target 2','Target 3','Target 4','Target 5','Target 6'];
+const bfsExplored=[398,120,657,297,350,524], astarExplored=[52,50,430,84,162,142];
+const bfsPath=[27,13,43,23,25,33], astarPath=[27,13,43,23,25,33];
+const bfsTime=[0.9434,0.3039,1.4616,1.0990,0.7111,1.2530], astarTime=[0.2963,0.2118,1.6460,0.3699,0.6338,0.5512];
+Chart.defaults.font.family='"Segoe UI", Arial, sans-serif';
+Chart.defaults.color='#64748b';
+function barChart(id,a,b,labelA,labelB){new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[{label:labelA,data:a,backgroundColor:'#2864dc',borderRadius:5},{label:labelB,data:b,backgroundColor:'#e69f00',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,grid:{color:'#edf1f7'}},x:{grid:{display:false}}}}})}
+barChart('exploredChart',bfsExplored,astarExplored,'BFS explored cells','A* explored cells');
+barChart('pathChart',bfsPath,astarPath,'BFS path steps','A* path steps');
+barChart('runtimeChart',bfsTime,astarTime,'BFS runtime (ms)','A* runtime (ms)');
+</script>
+</body></html>
