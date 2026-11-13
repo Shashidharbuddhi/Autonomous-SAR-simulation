@@ -12,9 +12,9 @@
   "target_coverage_percent": 100.0,
   "unreachable_targets": [],
   "path_length_grid_steps": 157,
-  "explored_cells_sum_per_plan": 549,
+  "explored_cells_sum_per_plan": 40500,
   "dynamic_obstacles_discovered": 8,
-  "replanning_count": 157,
+  "replanning_count": 5,
   "benchmark_first_target": {
     "start": [
       1,
@@ -28,14 +28,19 @@
       "reachable": true,
       "path_length": 27,
       "explored_cells": 398,
-      "runtime_seconds": 0.0010633000056259334
+      "runtime_seconds": 0.0010489999986020848
     },
     "astar": {
       "reachable": true,
       "path_length": 27,
       "explored_cells": 52,
-      "runtime_seconds": 0.00026420000358484685
+      "runtime_seconds": 0.0002666999935172498
     }
   },
-  "notes": "Runtime and exploration counts depend on hardware and map; this is a simulation."
+  "notes": "Runtime depends on hardware and system load. Explored-cell totals may count the same cell in multiple planning calls. Replanning count records events tracked by the robot, not total planning calls.",
+  "planning_calls": 157,
+  "robot_total_explored_cells": 40500,
+  "robot_total_planning_time_ms": 106.8265,
+  "selected_algorithm": "BFS",
+  "mission_runtime_seconds": 0.11286020000989083
 }
