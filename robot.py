@@ -1,18 +1,29 @@
 
-"""Rescue robot with limited-range sensing and stepwise navigation."""
+"""Rescue robot with selectable BFS/A* path planning."""
 
 from __future__ import annotations
 
-from path_planning import astar
+from path_planning import astar, bfs
 
 
 class RescueRobot:
-    def __init__(self, true_map, known_map, start, sensor_radius=2):
+    def __init__(
+        self,
+        true_map,
+        known_map,
+        start,
+        sensor_radius=2,
+        algorithm="A*",
+    ):
         self.true_map = true_map
         self.known_map = known_map.copy()
 
         self.position = tuple(start)
         self.sensor_radius = sensor_radius
+        self.algorithm = algorithm.upper()
+
+        if self.algorithm not in ("A*", "BFS"):
+            raise ValueError("Algorithm must be 'A*' or 'BFS'.")
 
         self.path_history = [tuple(start)]
         self.visited_targets = []
@@ -24,10 +35,32 @@ class RescueRobot:
         self.discovered_obstacles = []
         self.events = []
 
+        # Statistics for the most recent path-planning call.
+        self.last_explored = 0
+        self.last_planning_time = 0.0
+
+        # Cumulative planning statistics.
+        self.total_explored = 0
+        self.total_planning_time = 0.0
+
         self.sense()
 
+    def set_algorithm(self, algorithm):
+        """Change the planner used for future movement steps."""
+        algorithm = algorithm.upper()
+
+        if algorithm not in ("A*", "BFS"):
+            raise ValueError("Algorithm must be 'A*' or 'BFS'.")
+
+        self.algorithm = algorithm
+
+        self.events.append({
+            "event": "algorithm_changed",
+            "algorithm": algorithm,
+        })
+
     def sense(self):
-        """Discover obstacles inside the robot's square sensor range."""
+        """Discover obstacles inside the robot's sensor footprint."""
         r, c = self.position
         rows, cols = self.true_map.shape
 
@@ -54,12 +87,30 @@ class RescueRobot:
                             "cell": [rr, cc],
                         })
 
+    def _plan_path(self, target):
+        """Run the currently selected path-planning algorithm."""
+        planner = bfs if self.algorithm == "BFS" else astar
+
+        path, explored, elapsed = planner(
+            self.known_map,
+            self.position,
+            target,
+        )
+
+        self.planning_calls += 1
+        self.last_explored = explored
+        self.last_planning_time = elapsed
+
+        self.total_explored += explored
+        self.total_planning_time += elapsed
+
+        return path
+
     def step_toward(self, target):
         """
-        Advance by at most one cell toward a target.
+        Move at most one cell toward a target.
 
-        Returns one of:
-        'moved', 'reached', 'unreachable', or 'replanned'.
+        Returns: 'moved', 'reached', 'unreachable', or 'replanned'.
         """
         target = tuple(target)
 
@@ -77,12 +128,7 @@ class RescueRobot:
             })
             return "reached"
 
-        path, _, _ = astar(
-            self.known_map,
-            self.position,
-            target,
-        )
-        self.planning_calls += 1
+        path = self._plan_path(target)
 
         if not path:
             self.unreachable_targets.append(target)
@@ -102,7 +148,7 @@ class RescueRobot:
 
         next_cell = path[1]
 
-        # Safety check against the actual environment.
+        # Safety guard: never enter a cell blocked in the true map.
         if self.true_map[next_cell] == 1:
             if self.known_map[next_cell] == 0:
                 self.known_map[next_cell] = 1
@@ -118,17 +164,15 @@ class RescueRobot:
             self.replans += 1
             return "replanned"
 
-        # Move exactly one cell.
+        # Move one cell.
         self.position = next_cell
         self.path_history.append(self.position)
 
-        # Sense immediately after moving.
-        previous_discoveries = len(self.discovered_obstacles)
+        # Discover nearby obstacles after moving.
+        previous_count = len(self.discovered_obstacles)
         self.sense()
 
-        # Count a replan-triggering discovery separately from
-        # ordinary movement and ordinary path-planning calls.
-        if len(self.discovered_obstacles) > previous_discoveries:
+        if len(self.discovered_obstacles) > previous_count:
             self.replans += 1
 
         if self.position == target:
@@ -142,7 +186,7 @@ class RescueRobot:
         return "moved"
 
     def navigate_to(self, target):
-        """Navigate to a target using repeated one-cell steps."""
+        """Navigate to a target using repeated single-cell steps."""
         target = tuple(target)
 
         if target in self.visited_targets:
@@ -158,3 +202,4 @@ class RescueRobot:
                 return False
 
         return target in self.visited_targets
+ 
