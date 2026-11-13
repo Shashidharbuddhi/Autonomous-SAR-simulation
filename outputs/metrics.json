@@ -1,0 +1,41 @@
+{
+  "grid_size": [
+    24,
+    32
+  ],
+  "start": [
+    1,
+    1
+  ],
+  "total_targets": 6,
+  "targets_visited": 6,
+  "target_coverage_percent": 100.0,
+  "unreachable_targets": [],
+  "path_length_grid_steps": 157,
+  "explored_cells_sum_per_plan": 549,
+  "dynamic_obstacles_discovered": 8,
+  "replanning_count": 157,
+  "benchmark_first_target": {
+    "start": [
+      1,
+      1
+    ],
+    "goal": [
+      2,
+      27
+    ],
+    "bfs": {
+      "reachable": true,
+      "path_length": 27,
+      "explored_cells": 398,
+      "runtime_seconds": 0.0010633000056259334
+    },
+    "astar": {
+      "reachable": true,
+      "path_length": 27,
+      "explored_cells": 52,
+      "runtime_seconds": 0.00026420000358484685
+    }
+  },
+  "notes": "Runtime and exploration counts depend on hardware and map; this is a simulation."
+}
